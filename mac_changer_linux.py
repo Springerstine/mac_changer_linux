@@ -22,17 +22,6 @@ def get_arguments():
         parser.error("[-] Please specify a valid MAC Address, use --help for more information.")
     return options
 
-    
-
-def change_mac(interface, new_mac):
-    print("[+] Changing mac address for " + interface + " to " + new_mac)
-    # Shuts down wifi connection
-    subprocess.call(["ifconfig", interface, "down"])
-    # Changes MAC Addr
-    subprocess.call(["ifconfig", interface, "hw", "ether", new_mac])
-    # Turns wifi back on
-    subprocess.call(["ifconfig", interface, "up"])
-
 
 def get_current_mac(interface):
     ifconfig_result = subprocess.check_output(["ifconfig", options.interface])
@@ -44,16 +33,29 @@ def get_current_mac(interface):
     else:
         print("[-] Could not read the MAC Address.")
 
+def change_mac(interface, new_mac):
+    print("[+] Changing mac address for " + interface + " to " + new_mac)
+    # Shuts down wifi connection
+    subprocess.call(["ifconfig", interface, "down"])
+    # Changes MAC Addr
+    subprocess.call(["ifconfig", interface, "hw", "ether", new_mac])
+    # Turns wifi back on
+    subprocess.call(["ifconfig", interface, "up"])
+
 #Takes inputs and assignes them to opts and args
 options = get_arguments()
 
+#Assigns the "old" MAC, then prints
 current_mac = get_current_mac(options.interface)
 print("Current MAC = " + str(current_mac))
 
 #calls change_mac func
 change_mac(options.interface, options.new_mac)
 
+#Assigns the "new" MAC
 change_mac = get_current_mac(options.interface)
+
+#checks to see if MAC was changed successfully
 if change_mac == options.new_mac:
     print("[+] MAC Address was successfully changed to " + current_mac)
 else:
